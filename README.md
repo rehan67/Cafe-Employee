@@ -24,5 +24,29 @@ This project consists of a .NET 8 Web API backend and a React frontend built wit
 }
 ```
 
-```In Visual Studio Code, you can run the project using the following command:
+In Visual Studio Code, you can run the project using the following command:
+
+```runcmd
 dotnet run
+```
+In Visual Studio 2022, click the “Run” button in the navigation to start the project.
+
+### Frontend (React/Vite.js)
+Development Environment:
+1. For the frontend, you’ll be using React and Vite.js.
+2). Make sure you have Visual Studio Code installed.
+Node.js and npm:
+1). Ensure that your machine has the following versions installed:
+  1).Node.js v20.17.0
+  2).npm v10.8.2
+Update API Base URL:
+In the frontend, change the base API URL according to your backend setup. You can find this in the configuration file or directly in the code:
+
+        const API_BASE_URL = 'http://localhost:26655/api'; // Set your base URL here
+
+Run the Project:
+Open a terminal in the frontend folder and run the following command to start the development server:
+
+```runcmd
+npm run dev
+```
