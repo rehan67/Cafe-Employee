@@ -1,0 +1,6 @@
+@Cafe_Employee_HostAddress = http://localhost:5009
+
+GET {{Cafe_Employee_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
