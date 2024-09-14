@@ -1,48 +1,28 @@
-Café Employee Management System
-Backend (.NET 8)
-Development Environment:
-You can use Visual Studio 2022 or Visual Studio Code for backend development.
-Ensure that either Visual Studio 2022 or Visual Studio Code is installed on your machine.
-Internet Connection:
-Make sure your machine is connected to the internet before building the application.
-Build the Project:
-Before running the application, build the .NET 8 Web API project.
+# Cafe Employee Management System
 
-If you face any issues with NuGet packages, ensure you are connected to the internet while building.
+This project consists of a .NET 8 Web API backend and a React frontend built with Vite.js. The guide below provides detailed steps to set up both the backend and frontend, along with deployment instructions using Docker.
 
-Update the connection string in the appsettings.json file. Here's a sample configuration:
+---
 
-json
-Copy code
+## Backend (.NET 8)
+
+### Development Environment:
+- You can use either Visual Studio 2022 or Visual Studio Code for backend development.
+- Ensure that you have one of these tools installed on your machine.
+
+### Internet Connection:
+- Before building the application, ensure that your machine is connected to the internet.
+
+### Build the Project:
+1. Build the .NET 8 Web API project.
+2. If you face any NuGet package issues, make sure your machine is connected to the internet.
+3. Update the `appsettings.json` file with your database connection details. Below is a sample connection string:
+
+```json
 "ConnectionStrings": {
-  "DefaultConnection": "Server=ServerNameHere;Database=CafeEmployee;User Id=YourUserId;Password=YourPassword;TrustServerCertificate=True;"
+  "DefaultConnection": "Server=ServerNamehere;Database=CafeEmployee;User Id=idhere;Password=passwordhere; TrustServerCertificate=True;"
 }
-To run the project:
+```
 
-In Visual Studio Code, use the following command:
-bash
-Copy code
+```In Visual Studio Code, you can run the project using the following command:
 dotnet run
-In Visual Studio 2022, click the Run button in the navigation.
-Frontend (React / Vite.js)
-Development Environment:
-The frontend is developed using React with Vite.js.
-
-Ensure that Visual Studio Code is installed.
-
-Update the API base URL in your code to match your machine's configuration:
-
-javascript
-Copy code
-const API_BASE_URL = 'http://localhost:26655/api'; // Set your base URL here
-Node.js and npm:
-Ensure the following versions are installed on your machine:
-Node.js: v20.17.0
-npm: v10.8.2
-Run the Project:
-To run the frontend project, use the following command:
-bash
-Copy code
-npm run dev
-Follow these steps to set up the Café Employee Management System. If you encounter any issues or need further assistance, feel free to ask!
-
