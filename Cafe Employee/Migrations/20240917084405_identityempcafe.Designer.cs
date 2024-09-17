@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cafe_Employee.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240913193445_MakeLogoNullable")]
-    partial class MakeLogoNullable
+    [Migration("20240917084405_identityempcafe")]
+    partial class identityempcafe
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,7 +56,7 @@ namespace Cafe_Employee.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("427a0f4f-4419-4e2d-817f-872a31441440"),
+                            Id = new Guid("ab7ddd79-4768-4e10-9230-a21a5832b159"),
                             Description = "A cozy place for coffee lovers",
                             Location = "Downtown",
                             Logo = "",
@@ -64,7 +64,7 @@ namespace Cafe_Employee.Migrations
                         },
                         new
                         {
-                            Id = new Guid("b567aec5-270b-418b-a4d8-cd383275056b"),
+                            Id = new Guid("ba3f1bb8-23ef-421b-a084-40b40f6afc2a"),
                             Description = "Best lattes in town",
                             Location = "Uptown",
                             Logo = "",
@@ -79,7 +79,7 @@ namespace Cafe_Employee.Migrations
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
@@ -92,9 +92,15 @@ namespace Cafe_Employee.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailAddress")
+                        .IsUnique();
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
                     b.ToTable("Employees");
 
@@ -119,44 +125,42 @@ namespace Cafe_Employee.Migrations
 
             modelBuilder.Entity("Cafe_Employee.Data.Models.EmployeeCafe", b =>
                 {
+                    b.Property<string>("EmployeeId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("CafeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("CafeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("EmployeeId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("EmployeeId", "CafeId");
 
                     b.HasIndex("CafeId");
 
-                    b.HasIndex("EmployeeId")
-                        .IsUnique();
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("EmployeeCafes");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            CafeId = new Guid("427a0f4f-4419-4e2d-817f-872a31441440"),
                             EmployeeId = "UI0000001",
+                            CafeId = new Guid("ab7ddd79-4768-4e10-9230-a21a5832b159"),
+                            Id = 1,
                             StartDate = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = 2,
-                            CafeId = new Guid("b567aec5-270b-418b-a4d8-cd383275056b"),
                             EmployeeId = "UI0000002",
+                            CafeId = new Guid("ba3f1bb8-23ef-421b-a084-40b40f6afc2a"),
+                            Id = 2,
                             StartDate = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });

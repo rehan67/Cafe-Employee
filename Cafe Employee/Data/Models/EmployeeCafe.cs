@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Cafe_Employee.Data.Models
 {
     public class EmployeeCafe
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Ensures EF treats this as an identity column
         public int Id { get; set; }
 
         [Required]

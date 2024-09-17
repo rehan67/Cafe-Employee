@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
@@ -14,18 +14,11 @@ import {
   Typography,
   Box,
   Grid,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useEmployee, useCreateEmployee, useUpdateEmployee, useCafes } from '../queries/queries';
-
-// Define the validation schema with yup
-const schema = yup.object({
-  name: yup.string().min(6, 'Name must be between 6 and 10 characters').max(10).required('Name is required'),
-  emailAddress: yup.string().email('Invalid email address').required('Email is required'),
-  phoneNumber: yup.string().matches(/^[89]\d{7}$/, 'Invalid phone number (should start with 8 or 9 and be 8 digits)').required('Phone number is required'),
-  gender: yup.string().required('Gender is required'),
-  cafeId: yup.string().nullable(),
-});
 
 // Styled components
 const StyledContainer = styled(Box)(({ theme }) => ({
@@ -107,13 +100,35 @@ const AddEditEmployeePage = () => {
   const { id } = useParams();
   const isEditMode = !!id;
 
+  // Define the validation schema with yup
+  const schema = yup.object({
+    Id: isEditMode
+      ? yup.string() // Optional in edit mode
+      : yup
+          .string()
+          .matches(/^UI\d{9}$/, 'Employee Id must be in the format UIXXXXXXXXX, where X is a digit.')
+          .required('Employee Id is required'),
+    name: yup.string().min(4, 'Name must be between 4 and 10 characters').max(10).required('Name is required'),
+    emailAddress: yup.string().email('Invalid email address').required('Email is required'),
+    phoneNumber: yup
+      .string()
+      .matches(/^[89]\d{7}$/, 'Invalid phone number (should start with 8 or 9 and be 8 digits)')
+      .required('Phone number is required'),
+    gender: yup.string().required('Gender is required'),
+    cafeId: yup.string().nullable(),
+  });
+
   // Fetch employee and cafes data
   const { data: employee } = useEmployee(id);
   const { data: cafes } = useCafes();
 
   // Hooks for create and update employee operations
-  const { mutate: createEmployee } = useCreateEmployee();
-  const { mutate: updateEmployee } = useUpdateEmployee();
+  const { mutate: createEmployee, isError: isCreateError, error: createError } = useCreateEmployee();
+  const { mutate: updateEmployee, isError: isUpdateError, error: updateError } = useUpdateEmployee();
+
+  // Snackbar state for error notifications
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   // Initialize form methods from react-hook-form
   const {
@@ -137,6 +152,7 @@ const AddEditEmployeePage = () => {
   React.useEffect(() => {
     if (employee) {
       reset({
+        Id: employee.Id || '',
         name: employee.name || '',
         emailAddress: employee.emailAddress || '',
         phoneNumber: employee.phoneNumber || '',
@@ -149,11 +165,38 @@ const AddEditEmployeePage = () => {
   // Handle form submission
   const onSubmit = (data) => {
     if (isEditMode) {
-      updateEmployee({ ...data, id });
+
+      console.log("Edit" , data)
+      updateEmployee({ ...data, id }, {
+        onError: (error) => {
+          handleError(error);
+        },
+        onSuccess: () => {
+          navigate('/employees');
+        },
+      });
     } else {
-      createEmployee(data);
+      createEmployee(data, {
+        onError: (error) => {
+          handleError(error);
+        },
+        onSuccess: () => {
+          navigate('/employees');
+        },
+      });
     }
-    navigate('/employees');
+  };
+
+  // Handle error for API mutations
+  const handleError = (error) => {
+    const errorMessage = error?.response?.data?.message || 'An error occurred while saving the employee.';
+    setErrorMessage(errorMessage);
+    setOpenSnackbar(true);
+  };
+
+  // Close snackbar
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -164,6 +207,19 @@ const AddEditEmployeePage = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
+            {!isEditMode && (
+              <StyledTextField
+                {...register('Id')}
+                label="Employee Id (UIXXXXXXX)"
+                error={!!errors.Id}
+                helperText={errors.Id?.message}
+                fullWidth
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+              />
+            )}
+          </Grid>
+          <Grid item xs={12}>
             <StyledTextField
               {...register('name')}
               label="Name"
@@ -171,7 +227,7 @@ const AddEditEmployeePage = () => {
               helperText={errors.name?.message}
               fullWidth
               variant="outlined"
-              InputLabelProps={{ shrink: true }} // Ensure label is fixed on top
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -182,7 +238,7 @@ const AddEditEmployeePage = () => {
               helperText={errors.emailAddress?.message}
               fullWidth
               variant="outlined"
-              InputLabelProps={{ shrink: true }} // Ensure label is fixed on top
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -193,7 +249,7 @@ const AddEditEmployeePage = () => {
               helperText={errors.phoneNumber?.message}
               fullWidth
               variant="outlined"
-              InputLabelProps={{ shrink: true }} // Ensure label is fixed on top
+              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -239,6 +295,13 @@ const AddEditEmployeePage = () => {
           Cancel
         </CancelButton>
       </form>
+
+      {/* Snackbar for error notifications */}
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </StyledContainer>
   );
 };

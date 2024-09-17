@@ -1,5 +1,7 @@
 ﻿using Cafe_Employee.Business_Layer.EmployeeBL;
+using Cafe_Employee.CustomException;
 using Cafe_Employee.Data.Dto.EmployeeDtos;
+using Cafe_Employee.Data.ErrorModel;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -65,13 +67,33 @@ public class EmployeesController : ControllerBase
             var createdEmployee = await _employeeService.AddEmployeeAsync(createEmployeeDto);
             return CreatedAtAction(nameof(GetEmployeeById), new { id = createdEmployee.Id }, createdEmployee);
         }
+        catch (EmployeeAlreadyExistsException ex)
+        {
+            // Return 409 Conflict with detailed error response
+            return Conflict(new ErrorResponse
+            {
+                StatusCode = 409,
+                Message = ex.Message
+            });
+        }       
         catch (ArgumentException ex)
         {
-            return NotFound(ex.Message);
+            // Handle cases where the input is not valid
+            return BadRequest(new ErrorResponse
+            {
+                StatusCode = 400,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            // Handle unexpected errors
+            return StatusCode(500, new ErrorResponse
+            {
+                StatusCode = 500,
+                Message = "Internal server error.",
+                Details = ex.Message
+            });
         }
     }
 

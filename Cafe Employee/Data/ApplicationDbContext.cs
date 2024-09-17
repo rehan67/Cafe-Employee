@@ -15,9 +15,17 @@ namespace Cafe_Employee.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<EmployeeCafe>()
-                .HasIndex(ec => ec.EmployeeId)
+            // Configure unique constraints using Fluent API
+            modelBuilder.Entity<Employee>()
+                .HasIndex(e => e.EmailAddress)
                 .IsUnique();
+
+            modelBuilder.Entity<Employee>()
+                .HasIndex(e => e.PhoneNumber)
+                .IsUnique();
+
+            modelBuilder.Entity<EmployeeCafe>()
+                .HasKey(ec => new { ec.EmployeeId, ec.CafeId });
 
             modelBuilder.Entity<EmployeeCafe>()
                 .HasOne(ec => ec.Employee)
@@ -28,6 +36,13 @@ namespace Cafe_Employee.Data
                 .HasOne(ec => ec.Cafe)
                 .WithMany(c => c.EmployeeCafes)
                 .HasForeignKey(ec => ec.CafeId);
+
+            // Unique constraint to prevent the same employee from working in multiple cafes
+            modelBuilder.Entity<EmployeeCafe>()
+                .HasIndex(ec => ec.EmployeeId)
+                .IsUnique(false);
+
+
 
             // Seed data
             var cafeMochaId = Guid.NewGuid();

@@ -134,3 +134,4 @@ E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\refint\
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.pdb
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.genruntimeconfig.cache
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\ref\Cafe Employee.dll
+E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.sourcelink.json

@@ -33,9 +33,18 @@ namespace Cafe_Employee.Data_Layer.EmployeeDL
 
         public async Task AddEmployeeAsync(Employee employee, EmployeeCafe employeeCafe)
         {
-            _context.Employees.Add(employee);
-            _context.EmployeeCafes.Add(employeeCafe);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Employees.Add(employee);
+                _context.EmployeeCafes.Add(employeeCafe);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+         
         }
 
         public async Task UpdateEmployeeAsync(Employee employee, EmployeeCafe employeeCafe)

@@ -1,5 +1,8 @@
-﻿using Cafe_Employee.Data.Dto.EmployeeDtos;
+﻿using Cafe_Employee.Business_Layer.EmployCafe;
+using Cafe_Employee.CustomException;
+using Cafe_Employee.Data.Dto.EmployeeDtos;
 using Cafe_Employee.Data.Models;
+using Cafe_Employee.Data_Layer.EmployCafe;
 using Cafe_Employee.Data_Layer.EmployeeDL;
 
 namespace Cafe_Employee.Business_Layer.EmployeeBL
@@ -7,10 +10,14 @@ namespace Cafe_Employee.Business_Layer.EmployeeBL
     public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeCafeRepository _employeeCafeRepository;
+      
 
-        public EmployeeService(IEmployeeRepository employeeRepository)
+        public EmployeeService(IEmployeeRepository employeeRepository,  IEmployeeCafeRepository employeeCafeRepository)
         {
             _employeeRepository = employeeRepository;
+            _employeeCafeRepository = employeeCafeRepository;
+        
         }
 
         // Get Employee by Cafe 
@@ -75,26 +82,28 @@ namespace Cafe_Employee.Business_Layer.EmployeeBL
         // Add Employee
         public async Task<EmployeeDto> AddEmployeeAsync(CreateEmployeeDto employeeDto)
         {
-            // Check if the Cafe exists
-            bool cafeExists = await _employeeRepository.CafeExistsById(employeeDto.CafeId);
-            if (!cafeExists)
+            // Check if employee id exist in employee
+            var existingEmployee = await _employeeRepository.GetEmployeeById(employeeDto.Id);
+            if (existingEmployee != null) 
             {
-                throw new ArgumentException($"Cafe with ID {employeeDto.CafeId} not found.");
+            
+                throw new EmployeeAlreadyExistsException($"Employee {employeeDto.Id} is already Exist, Please Use Another Id.");
             }
 
-            // Generate a unique employee ID
-            string newEmployeeId = GenerateEmployeeId();
 
-            // Ensure the employee ID is unique
-            while (await _employeeRepository.EmployeeExistsById(newEmployeeId))
-            {
-                newEmployeeId = GenerateEmployeeId();
+            // Check if the employee is already working in a cafe
+            var existingEmployeeCafe = await _employeeCafeRepository
+                .GetByIdAsync(employeeDto.Id);
+
+            if (existingEmployeeCafe != null)
+            {             
+                throw new EmployeeAlreadyExistsException($"Employee {employeeDto.Name} is already assigned to a café.");
             }
 
             // Create a new employee
             var employee = new Employee
             {
-                Id = newEmployeeId,
+                Id = employeeDto.Id,
                 Name = employeeDto.Name,
                 EmailAddress = employeeDto.EmailAddress,
                 PhoneNumber = employeeDto.PhoneNumber,
@@ -132,50 +141,58 @@ namespace Cafe_Employee.Business_Layer.EmployeeBL
         // Update Emplopyee
         public async Task<EmployeeDto> UpdateEmployeeAsync(string employeeId, UpdateEmployeeDto employeeDto)
         {
-            var employee = await _employeeRepository.GetEmployeeById(employeeId);
-            if (employee == null)
+            try
             {
-                throw new ArgumentException($"Employee with ID {employeeId} not found.");
-            }
-
-            // Check if the cafe exists before updating
-            bool cafeExists = await _employeeRepository.CafeExistsById(employeeDto.CafeId);
-            if (!cafeExists)
-            {
-                throw new ArgumentException($"Cafe with ID {employeeDto.CafeId} not found.");
-            }
-
-            // Update employee details
-            employee.Name = employeeDto.Name;
-            employee.EmailAddress = employeeDto.EmailAddress;
-            employee.PhoneNumber = employeeDto.PhoneNumber;
-            employee.Gender = employeeDto.Gender;
-
-            // Update employee-cafe relation
-            var employeeCafe = new EmployeeCafe
-            {
-                EmployeeId = employeeId,
-                CafeId = employeeDto.CafeId,
-                //StartDate = employeeDto.StartDate
-            };
-
-            // Update employee and relationship in the database
-            await _employeeRepository.UpdateEmployeeAsync(employee, employeeCafe);
-
-            return new EmployeeDto
-            {
-                Id = employee.Id,
-                Name = employee.Name,
-                EmailAddress = employee.EmailAddress,
-                PhoneNumber = employee.PhoneNumber,
-                Gender = employee.Gender,
-                DaysWorked = CalculateDaysWorked(employee.Id).Result,
-                Cafe = employee.EmployeeCafes.FirstOrDefault() != null ? new CafeDropdown
+                var employee = await _employeeRepository.GetEmployeeById(employeeId);
+                if (employee == null)
                 {
-                    CafeId = employee.EmployeeCafes.FirstOrDefault().Cafe.Id,
-                    Cafe = employee.EmployeeCafes.FirstOrDefault().Cafe.Name
-                } : null
-            };
+                    throw new ArgumentException($"Employee with ID {employeeId} not found.");
+                }
+
+
+
+                // Update employee details
+                employee.Name = employeeDto.Name;
+                employee.EmailAddress = employeeDto.EmailAddress;
+                employee.PhoneNumber = employeeDto.PhoneNumber;
+                employee.Gender = employeeDto.Gender;
+
+                // Update employee-cafe relation
+                var employeeCafe = new EmployeeCafe
+                {
+                    EmployeeId = employeeId,
+                    CafeId = employeeDto.CafeId,
+                    StartDate = DateTime.Now
+                };
+
+
+                // Remove all existing café assignments for the employee
+                await _employeeCafeRepository.DeleteByEmployeeIdAsync(employeeId);
+
+                // Update employee and relationship in the database
+                await _employeeRepository.UpdateEmployeeAsync(employee, employeeCafe);
+
+                return new EmployeeDto
+                {
+                    Id = employee.Id,
+                    Name = employee.Name,
+                    EmailAddress = employee.EmailAddress,
+                    PhoneNumber = employee.PhoneNumber,
+                    Gender = employee.Gender,
+                    DaysWorked = CalculateDaysWorked(employee.Id).Result,
+                    Cafe = employee.EmployeeCafes.FirstOrDefault() != null ? new CafeDropdown
+                    {
+                        CafeId = employee.EmployeeCafes.FirstOrDefault().Cafe.Id,
+                        Cafe = employee.EmployeeCafes.FirstOrDefault().Cafe.Name,
+                    } : null
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+           
         }
 
         // Delete Employee

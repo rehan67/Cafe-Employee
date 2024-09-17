@@ -1,7 +1,9 @@
 using Cafe_Employee.Business_Layer.CafeBL;
+using Cafe_Employee.Business_Layer.EmployCafe;
 using Cafe_Employee.Business_Layer.EmployeeBL;
 using Cafe_Employee.Data;
 using Cafe_Employee.Data_Layer.CafeDL;
+using Cafe_Employee.Data_Layer.EmployCafe;
 using Cafe_Employee.Data_Layer.EmployeeDL;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +24,8 @@ builder.Services.AddScoped<ICafeService, CafeService>();
 // Employee
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IEmployeeCafeRepository, EmployeeCafeRepository>();
+builder.Services.AddScoped<IEmployeeCafeService, EmployeeCafeService>();
 
 
 builder.Services.AddControllers();
