@@ -19,16 +19,32 @@ public class EmployeesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetEmployees()
     {
-        var employees = await _employeeService.GetAllEmployees();
-        return Ok(employees);
+        try
+        {
+            var employees = await _employeeService.GetAllEmployees();
+            return Ok(employees);
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     // Get Employee By cafe
     [HttpGet("by-cafe")]
     public async Task<IActionResult> GetEmployeesByCafe([FromQuery] string cafe)
     {
-        var employees = await _employeeService.GetEmployees(cafe);
-        return Ok(employees);
+        try
+        {
+            var employees = await _employeeService.GetEmployees(cafe);
+            return Ok(employees);
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     // Get Employee by Id
@@ -125,8 +141,16 @@ public class EmployeesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteEmployee(string id)
     {
-        await _employeeService.DeleteEmployee(id);
-        return NoContent();
+        try
+        {
+            await _employeeService.DeleteEmployee(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 }
 

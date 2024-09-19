@@ -18,24 +18,48 @@ public class CafesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetCafes()
     {
-        var cafes = await _cafeService.GetCafes();
-        return Ok(cafes);
+        try
+        {
+            var cafes = await _cafeService.GetCafes();
+            return Ok(cafes);
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     // Get Cafe by Id
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCafeById(Guid id)
     {
-        var cafes = await _cafeService.GetCafeById(id);
-        return Ok(cafes);
+        try
+        {
+            var cafes = await _cafeService.GetCafeById(id);
+            return Ok(cafes);
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     // Get Cafe by Location
     [HttpGet("by-location")]
     public async Task<IActionResult> GetCafesByLocation([FromQuery] string location)
     {
-        var cafes = await _cafeService.GetCafesByLocation(location);
-        return Ok(cafes);
+        try
+        {
+            var cafes = await _cafeService.GetCafesByLocation(location);
+            return Ok(cafes);
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     // Add Cafe
@@ -60,15 +84,30 @@ public class CafesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCafe(Guid id, [FromBody] UpdateCafeDto cafeDto)
     {
-        await _cafeService.UpdateCafe(id, cafeDto);
-        return NoContent();
+        try
+        {
+            await _cafeService.UpdateCafe(id, cafeDto);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     // Delete Cafe
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCafe(Guid id)
     {
-        await _cafeService.DeleteCafe(id);
-        return NoContent();
+        try
+        {
+            await _cafeService.DeleteCafe(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 }
