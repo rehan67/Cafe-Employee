@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cafe Employee", "Cafe Employee\Cafe Employee.csproj", "{6ACCA725-75B3-4DB1-9F5A-55B38ECCF2C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cafe Employee", "Cafe Employee\Cafe Employee.csproj", "{6ACCA725-75B3-4DB1-9F5A-55B38ECCF2C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CafeEmployee.Tests", "CafeEmployee.Tests\CafeEmployee.Tests.csproj", "{A46DB762-2680-4E55-BCF5-6A030BCA4FC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6ACCA725-75B3-4DB1-9F5A-55B38ECCF2C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6ACCA725-75B3-4DB1-9F5A-55B38ECCF2C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6ACCA725-75B3-4DB1-9F5A-55B38ECCF2C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A46DB762-2680-4E55-BCF5-6A030BCA4FC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A46DB762-2680-4E55-BCF5-6A030BCA4FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A46DB762-2680-4E55-BCF5-6A030BCA4FC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A46DB762-2680-4E55-BCF5-6A030BCA4FC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

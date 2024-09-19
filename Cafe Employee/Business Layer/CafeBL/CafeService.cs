@@ -1,36 +1,29 @@
-﻿
-using Cafe_Employee.Data.Dto.CafeDtos;
+﻿using Cafe_Employee.Data.Dto.CafeDtos;
 using Cafe_Employee.Data.Models;
 using Cafe_Employee.Data_Layer.CafeDL;
-
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Cafe_Employee.Business_Layer.CafeBL
 {
     public class CafeService : ICafeService
     {
+        private readonly ICafeRepository _cafeRepository;
 
-        private readonly ICafeRepository _cafeRepo;
-
-        public CafeService(ICafeRepository cafeRepo)
+        public CafeService(ICafeRepository cafeRepository)
         {
-            _cafeRepo = cafeRepo;
+            _cafeRepository = cafeRepository;
         }
 
-        // Get All Cafe
+        // Get all cafes
         public async Task<IEnumerable<CafeDto>> GetCafes()
         {
-            var cafes = await _cafeRepo.GetCafes();
-            return cafes.Select(c => new CafeDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description,
-                Location = c.Location,
-                Employees = c.EmployeeCafes.Count
-            }).ToList();
+            var cafes = await _cafeRepository.GetCafes();
+            return cafes.Select(MapToCafeDto).ToList();
         }
 
-        // Add Cafe
+        // Add a new cafe
         public async Task AddCafe(CreateCafeDto cafeDto)
         {
             var cafe = new Cafe
@@ -38,58 +31,56 @@ namespace Cafe_Employee.Business_Layer.CafeBL
                 Id = Guid.NewGuid(),
                 Name = cafeDto.Name,
                 Description = cafeDto.Description,
-                Location = cafeDto.Location,
+                Location = cafeDto.Location
             };
 
-            await _cafeRepo.AddCafe(cafe);
+            await _cafeRepository.AddCafe(cafe);
         }
 
-        // Update Cafe
+        // Update existing cafe
         public async Task UpdateCafe(Guid id, UpdateCafeDto cafeDto)
         {
-            var cafe = await _cafeRepo.GetCafeById(id);
-            if (cafe != null)
-            {
-                cafe.Name = cafeDto.Name;
-                cafe.Description = cafeDto.Description;
-                cafe.Location = cafeDto.Location;
+            var cafe = await _cafeRepository.GetCafeById(id);
+            if (cafe == null) return;
 
-                await _cafeRepo.UpdateCafe(cafe);
-            }
+            cafe.Name = cafeDto.Name;
+            cafe.Description = cafeDto.Description;
+            cafe.Location = cafeDto.Location;
+
+            await _cafeRepository.UpdateCafe(cafe);
         }
 
+        // Delete cafe by id
         public async Task DeleteCafe(Guid id)
         {
-            await _cafeRepo.DeleteCafe(id);
+            await _cafeRepository.DeleteCafe(id);
         }
 
-        // Get Cafe by location
+        // Get cafes by location
         public async Task<IEnumerable<CafeDto>> GetCafesByLocation(string location)
         {
-            var cafes = await _cafeRepo.GetCafesByLocation(location);
-            return cafes.Select(c => new CafeDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description,
-                Location = c.Location,
-                Employees = c.EmployeeCafes.Count
-            }).ToList();
+            var cafes = await _cafeRepository.GetCafesByLocation(location);
+            return cafes.Select(MapToCafeDto).ToList();
         }
 
-        // Get Cafe by Id
-        public async Task<CafeDto> GetCafesById(Guid id)
+        // Get cafe by id
+        public async Task<CafeDto> GetCafeById(Guid id)
         {
-            var cafes = await _cafeRepo.GetCafeById(id);
+            var cafe = await _cafeRepository.GetCafeById(id);
+            return cafe != null ? MapToCafeDto(cafe) : null;
+        }
+
+        // Private helper method to map Cafe to CafeDto
+        private static CafeDto MapToCafeDto(Cafe cafe)
+        {
             return new CafeDto
             {
-                Id = cafes.Id,
-                Name = cafes.Name,
-                Description = cafes.Description,
-                Location = cafes.Location,
-                Employees = cafes.EmployeeCafes.Count
+                Id = cafe.Id,
+                Name = cafe.Name,
+                Description = cafe.Description,
+                Location = cafe.Location,
+                Employees = cafe.EmployeeCafes.Count
             };
         }
     }
-
 }

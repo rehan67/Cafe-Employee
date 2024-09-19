@@ -13,24 +13,39 @@ namespace Cafe_Employee.Data_Layer.EmployeeDL
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves employees for a specific cafe.
+        /// </summary>
+        /// <param name="cafeName">The name of the cafe to filter employees by.</param>
+        /// <returns>A collection of Employee objects.</returns>
         public async Task<IEnumerable<Employee>> GetEmployees(string cafeName)
         {
             var employees = _context.Employees
                 .Include(e => e.EmployeeCafes)
-                .ThenInclude(relation => relation.Cafe)
-                .Where(e => string.IsNullOrEmpty(cafeName) || e.EmployeeCafes.Any(r => r.Cafe.Name == cafeName));
+                .ThenInclude(ec => ec.Cafe)
+                .Where(e => string.IsNullOrEmpty(cafeName) || e.EmployeeCafes.Any(ec => ec.Cafe.Name == cafeName));
 
             return await employees.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves an employee by their unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the employee.</param>
+        /// <returns>The Employee object if found; otherwise, null.</returns>
         public async Task<Employee> GetEmployeeById(string id)
         {
-            return await _context.Employees?
+            return await _context.Employees
                 .Include(e => e.EmployeeCafes)
-                .ThenInclude(relation => relation.Cafe)
-                .FirstOrDefaultAsync(e => e.Id == id)!;
+                .ThenInclude(ec => ec.Cafe)
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
+        /// <summary>
+        /// Adds a new employee and their association with a cafe.
+        /// </summary>
+        /// <param name="employee">The employee to add.</param>
+        /// <param name="employeeCafe">The EmployeeCafe object representing the association.</param>
         public async Task AddEmployeeAsync(Employee employee, EmployeeCafe employeeCafe)
         {
             try
@@ -41,31 +56,52 @@ namespace Cafe_Employee.Data_Layer.EmployeeDL
             }
             catch (Exception ex)
             {
-
-                throw;
+                // Log the exception (optional)
+                // _logger.LogError(ex, "An error occurred while adding the employee.");
+                throw new InvalidOperationException("An error occurred while adding the employee.", ex);
             }
-         
         }
 
+        /// <summary>
+        /// Updates an existing employee and their association with a cafe.
+        /// </summary>
+        /// <param name="employee">The updated employee details.</param>
+        /// <param name="employeeCafe">The EmployeeCafe object representing the updated association.</param>
         public async Task UpdateEmployeeAsync(Employee employee, EmployeeCafe employeeCafe)
         {
-            var existingRelation = await _context.EmployeeCafes
-                .FirstOrDefaultAsync(r => r.EmployeeId == employee.Id);
+            var existingEmployee = await _context.Employees
+                .Include(e => e.EmployeeCafes)
+                .FirstOrDefaultAsync(e => e.Id == employee.Id);
 
-            if (existingRelation != null)
+            if (existingEmployee == null)
+                throw new ArgumentException("Employee not found");
+
+            // Update employee details
+            existingEmployee.Name = employee.Name;
+            existingEmployee.EmailAddress = employee.EmailAddress;
+            existingEmployee.PhoneNumber = employee.PhoneNumber;
+            existingEmployee.Gender = employee.Gender;
+
+            // Update or add employee-cafe association
+            var existingCafe = existingEmployee.EmployeeCafes
+                .FirstOrDefault(ec => ec.CafeId == employeeCafe.CafeId);
+
+            if (existingCafe != null)
             {
-                existingRelation.CafeId = employeeCafe.CafeId;
-                existingRelation.StartDate = employeeCafe.StartDate;
+                existingCafe.StartDate = employeeCafe.StartDate;
             }
             else
             {
                 _context.EmployeeCafes.Add(employeeCafe);
             }
 
-            _context.Employees.Update(employee);
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Deletes an employee by their unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the employee to delete.</param>
         public async Task DeleteEmployee(string id)
         {
             var employee = await _context.Employees
@@ -79,22 +115,37 @@ namespace Cafe_Employee.Data_Layer.EmployeeDL
                 await _context.SaveChangesAsync();
             }
         }
+
+        /// <summary>
+        /// Checks if an employee exists by their unique identifier.
+        /// </summary>
+        /// <param name="employeeId">The unique identifier of the employee.</param>
+        /// <returns>True if the employee exists; otherwise, false.</returns>
         public async Task<bool> EmployeeExistsById(string employeeId)
         {
             return await _context.Employees.AnyAsync(e => e.Id == employeeId);
         }
 
+        /// <summary>
+        /// Checks if a cafe exists by its unique identifier.
+        /// </summary>
+        /// <param name="cafeId">The unique identifier of the cafe.</param>
+        /// <returns>True if the cafe exists; otherwise, false.</returns>
         public async Task<bool> CafeExistsById(Guid cafeId)
         {
             return await _context.Cafes.AnyAsync(c => c.Id == cafeId);
         }
 
+        /// <summary>
+        /// Retrieves all employees.
+        /// </summary>
+        /// <returns>A collection of Employee objects.</returns>
         public async Task<IEnumerable<Employee>> GetAllEmployees()
-        {             
-
+        {
             return await _context.Employees
                 .Include(e => e.EmployeeCafes)
-                .ThenInclude(relation => relation.Cafe).ToListAsync();
+                .ThenInclude(ec => ec.Cafe)
+                .ToListAsync();
         }
     }
 }

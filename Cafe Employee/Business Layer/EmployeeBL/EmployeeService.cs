@@ -1,5 +1,4 @@
-﻿using Cafe_Employee.Business_Layer.EmployCafe;
-using Cafe_Employee.CustomException;
+﻿using Cafe_Employee.CustomException;
 using Cafe_Employee.Data.Dto.EmployeeDtos;
 using Cafe_Employee.Data.Models;
 using Cafe_Employee.Data_Layer.EmployCafe;
@@ -44,6 +43,8 @@ namespace Cafe_Employee.Business_Layer.EmployeeBL
         public async Task<IEnumerable<EmployeeDto>> GetAllEmployees()
         {
             var employees = await _employeeRepository.GetAllEmployees();
+            if (employees == null) return new List<EmployeeDto>();
+
             return employees.Select(e => new EmployeeDto
             {
                 Id = e.Id,
@@ -51,14 +52,15 @@ namespace Cafe_Employee.Business_Layer.EmployeeBL
                 EmailAddress = e.EmailAddress,
                 Gender = e.Gender,
                 PhoneNumber = e.PhoneNumber,
-                DaysWorked = e.EmployeeCafes.Any() ? CalculateDaysWorked(e.Id).Result : 0,
-                Cafe = e.EmployeeCafes.FirstOrDefault() != null ? new CafeDropdown
+                DaysWorked = e.EmployeeCafes != null && e.EmployeeCafes.Any() ? CalculateDaysWorked(e.Id).Result : 0,
+                Cafe = e.EmployeeCafes != null && e.EmployeeCafes.FirstOrDefault() != null ? new CafeDropdown
                 {
-                    CafeId = e.EmployeeCafes.FirstOrDefault().Cafe.Id,
-                    Cafe = e.EmployeeCafes.FirstOrDefault().Cafe.Name
+                    CafeId = e.EmployeeCafes.FirstOrDefault().Cafe?.Id ?? Guid.Empty,
+                    Cafe = e.EmployeeCafes.FirstOrDefault().Cafe?.Name
                 } : null
             }).ToList();
         }
+
 
         // Get Employee by Id
         public async Task<EmployeeDto> GetEmployeeById(string id)
@@ -149,8 +151,6 @@ namespace Cafe_Employee.Business_Layer.EmployeeBL
                     throw new ArgumentException($"Employee with ID {employeeId} not found.");
                 }
 
-
-
                 // Update employee details
                 employee.Name = employeeDto.Name;
                 employee.EmailAddress = employeeDto.EmailAddress;
@@ -206,8 +206,15 @@ namespace Cafe_Employee.Business_Layer.EmployeeBL
         public async Task<int> CalculateDaysWorked(string employeeId)
         {
             var employee = await _employeeRepository.GetEmployeeById(employeeId);
+            if (employee == null || employee.EmployeeCafes == null || !employee.EmployeeCafes.Any())
+            {
+                return 0;
+            }
+
             var startDate = employee.EmployeeCafes.FirstOrDefault()?.StartDate ?? DateTime.Now;
-            return (DateTime.Now - startDate).Days;
+            var daysWorked = (DateTime.Now - startDate).Days;       
+
+            return daysWorked;
         }
 
         // GenerateEmployeeId

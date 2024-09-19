@@ -24,9 +24,9 @@ public class CafesController : ControllerBase
 
     // Get Cafe by Id
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetCafesById(Guid id)
+    public async Task<IActionResult> GetCafeById(Guid id)
     {
-        var cafes = await _cafeService.GetCafesById(id);
+        var cafes = await _cafeService.GetCafeById(id);
         return Ok(cafes);
     }
 

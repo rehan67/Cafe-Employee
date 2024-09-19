@@ -120,6 +120,7 @@ E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Em
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.csproj.CoreCompileInputs.cache
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.MvcApplicationPartsAssemblyInfo.cs
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.MvcApplicationPartsAssemblyInfo.cache
+E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.sourcelink.json
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\staticwebassets.build.json
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\staticwebassets.development.json
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\staticwebassets\msbuild.Cafe Employee.Microsoft.AspNetCore.StaticWebAssets.props
@@ -134,4 +135,3 @@ E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\refint\
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.pdb
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.genruntimeconfig.cache
 E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\ref\Cafe Employee.dll
-E:\Rehan\.NET Projects\Cafe\Cafe Employee\Cafe Employee\obj\Debug\net8.0\Cafe Employee.sourcelink.json

@@ -11,7 +11,7 @@
   },
   {
     "ContainingType": "CafesController",
-    "Method": "GetCafesById",
+    "Method": "GetCafeById",
     "RelativePath": "api/Cafes/{id}",
     "HttpMethod": "GET",
     "IsController": true,
